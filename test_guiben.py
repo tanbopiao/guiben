@@ -1,4 +1,4 @@
-"""圭本（GUIBEN）算子骨架单测：名帖完整、桩位齐整、只增不覆盖。"""
+"""圭本（GUIBEN）算子单测：名帖完整、行为达标、只增不覆盖。"""
 import unittest
 
 from guiben import Guiben
@@ -15,13 +15,14 @@ class TestGuiben(unittest.TestCase):
         self.assertTrue(d["anchor"].startswith("Ω₀⊂⊙∞⊂Ω"))
         self.assertTrue(d["mingwen"])
 
-    def test_freeze_stub(self):
-        with self.assertRaises(NotImplementedError):
-            self.op.freeze(None)
-
-    def test_compare_stub(self):
-        with self.assertRaises(NotImplementedError):
-            self.op.compare(None)
+    def test_freeze_compare(self):
+        self.op.freeze({"a": 1, "b": 2})
+        self.assertEqual(self.op.compare({"a": 1, "b": 2}), [])
+        diffs = self.op.compare({"a": 9, "c": 3})
+        kinds = {d["key"]: d["kind"] for d in diffs}
+        self.assertEqual(kinds, {"a": "changed", "b": "missing", "c": "extra"})
+        with self.assertRaises(RuntimeError):
+            Guiben().compare({})
 
 
 if __name__ == "__main__":
